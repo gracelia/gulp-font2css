@@ -2,7 +2,7 @@
   "name": "gulp-font2css",
   "version": "0.2.0",
   "description": "Encode font files as CSS using Gulp.",
-  "repository": "goblindegook/gulp-font2css",
+  "repository": "gracelia/gulp-font2css.git",
   "author": {
     "name": "Luís Rodrigues",
     "email": "hello@goblindegook.com",
