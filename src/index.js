@@ -10,6 +10,18 @@ import replaceExt from 'replace-ext'
 import PluginError from 'plugin-error'
 
 /**
+ * Custom font src url.
+ * @param  {Object} file Font file
+ * @param  {String} dest Font file dest folder
+ * @return {String} url  Font src url.
+ */
+function customFilePath(file, dest) {
+    if (!file) return
+    const filename = /([\w.-\s]+).\w+$/.exec(file.path)[0];
+    return /\/$/.test(dest) ? dest + filename : '/' + dest + filename;
+}
+
+/**
  * Extract the `font-family` from the font's file name.
  * @param  {String} basename Font base filename.
  * @param  {Int}    count    Count of guessed information to extract.
@@ -74,9 +86,13 @@ function guessFontWeight(basename) {
  * @param  {Object} file File object.
  * @return {String}      Base64-encoded contents inside a `data:` URL.
  */
-function getSrc(file) {
-  const encodedContents = new Buffer.from(file.contents).toString('base64')
-  return `src:url(data:${mime.getType(file.path)};charset=utf-8;base64,${encodedContents});`
+function getSrc(file, dest) {
+    if (dest) {
+        return 'src:url(' + customFilePath(file, dest) + ');';
+    } else {
+        const encodedContents = new Buffer.from(file.contents).toString('base64')
+        return `src:url(data:${mime.getType(file.path)};charset=utf-8;base64,${encodedContents});`
+    }
 }
 
 /**
@@ -88,7 +104,7 @@ function getSrc(file) {
  *
  * @return {Object} CSS file object.
  */
-function font2css() {
+function font2css(params) {
   return through.obj(function (file, enc, callback) {
     if (file.isNull()) {
       this.push(file)
@@ -115,7 +131,11 @@ function font2css() {
       }
 
       attributes.push(getFontFamily(basename, attributes.length))
-      attributes.push(getSrc(file))
+      if (params && params.dest) {
+        attributes.push(getSrc(file, params.dest))
+      } else{
+        attributes.push(getSrc(file))
+      }
 
       const contents = `@font-face{${attributes.join('')}}`
 
