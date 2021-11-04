@@ -17,7 +17,7 @@ import PluginError from 'plugin-error'
  */
 function customFilePath(file, dest) {
     if (!file) return
-    const filename = /.+\/(.+.[otf|ttf|woff|woff2])$/.exec(file.path)[1];
+    const filename = /.+\/(.+.[otf|ttf|woff|woff2])$/i.exec(file.path)[1];
     return /\/$/.test(dest) ? dest + filename : '/' + dest + filename;
 }
 
